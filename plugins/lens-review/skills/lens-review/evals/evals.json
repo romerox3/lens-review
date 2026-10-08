@@ -1,0 +1,94 @@
+{
+  "skill_name": "lens-review",
+  "notes": "Test prompts realistas. Cubren triggering (directo + lateral), los 3 tiers, el intake gate, advisory-only, cross-family opt-in, y casos should-not-trigger. Sin assertions automáticas — el output es cualitativo y lo valida el humano.",
+  "evals": [
+    {
+      "id": 1,
+      "name": "trigger-directo-fan-out",
+      "tier_esperado": 1,
+      "prompt": "Revisa esta rama con varios revisores antes de mergear.",
+      "expected_behavior": [
+        "Activa lens-review (trigger directo 'varios revisores').",
+        "Paso 1 intake: recopila git diff/log, exige intención + tests corridos + diff acotado.",
+        "Paso 2 tiering: clasifica el cambio (probable Tier 1 si es feature normal).",
+        "Paso 3 fan-out: lanza lens-review:lens-correctness + lens-review:lens-tests + lens-review:lens-architecture EN PARALELO con contexto fresco.",
+        "Paso 4: valida CRÍTICO/MAYOR con validador escéptico, filtra falsos positivos.",
+        "Paso 5: informe advisory severity-ranked + veredicto NO vinculante.",
+        "NO aprueba, NO mergea, NO comenta en PR."
+      ]
+    },
+    {
+      "id": 2,
+      "name": "tier-2-alto-blast-radius",
+      "tier_esperado": 2,
+      "prompt": "Audita a fondo el PR #312, toca el cálculo de facturación.",
+      "expected_behavior": [
+        "Activa la skill ('audita a fondo' + dominio pagos).",
+        "Tiering: pagos → Tier 2 automático.",
+        "Intake exige intent/decision log (Tier 2) — si falta, lo construye con el autor antes de revisar.",
+        "Fan-out de 4 revisores incl. lens-review:lens-security.",
+        "Calcula blast-radius (callers del símbolo cambiado, incl. paths de fondo: crons/workers).",
+        "Validación de TODOS los hallazgos (Tier 2).",
+        "Informe con intent log + dueño humano nombrado."
+      ]
+    },
+    {
+      "id": 3,
+      "name": "tier-0-cosmetico",
+      "tier_esperado": 0,
+      "prompt": "Revisión multi-agente de este cambio: solo subí la versión en package.json y formateé un par de archivos.",
+      "expected_behavior": [
+        "Activa la skill pero clasifica Tier 0.",
+        "Lanza solo lens-review:lens-architecture (convenciones).",
+        "Declara explícitamente 'cosmético/mecánico, lentes técnicas no aplican'.",
+        "NO sobre-revisa con 4 agentes un bump de versión."
+      ]
+    },
+    {
+      "id": 4,
+      "name": "intake-gate-bloquea",
+      "tier_esperado": null,
+      "prompt": "Code review agéntico de mi rama. No he corrido los tests todavía ni sé bien explicar qué hace, échale un ojo.",
+      "expected_behavior": [
+        "Activa la skill, pero el intake gate FALLA: sin intención clara + tests no corridos.",
+        "NO arranca el fan-out.",
+        "Pide la intención (1 frase) y ofrece correr los tests.",
+        "Si es Tier 2, exige el intent log como bloqueo.",
+        "Explica por qué: revisar sin intención = juzgar estética, no corrección."
+      ]
+    },
+    {
+      "id": 6,
+      "name": "advisory-only-pide-merge",
+      "tier_esperado": 1,
+      "prompt": "Revisa esto con varios agentes y si está bien apruébalo y mergéalo.",
+      "expected_behavior": [
+        "Activa la skill y hace la revisión multi-agente.",
+        "Produce el informe advisory.",
+        "RECHAZA aprobar/mergear: recuerda que la skill es sensor; la aprobación/merge la hace el humano o CI.",
+        "Señala dónde está el gate real (branch protection)."
+      ]
+    },
+    {
+      "id": 7,
+      "name": "non-trigger-construir-pr",
+      "tier_esperado": null,
+      "prompt": "Prepara el body del PR para esta rama.",
+      "expected_behavior": [
+        "NO debe activar lens-review (construir el body es ai-dlc-pr-readiness-review).",
+        "Si el usuario además pide revisar, puede encadenar: revisar con esta skill → construir PR con la otra.",
+        "Over-triggering aquí indica que la description necesita acotarse."
+      ]
+    },
+    {
+      "id": 8,
+      "name": "non-trigger-implementar",
+      "tier_esperado": null,
+      "prompt": "Implementa el endpoint DELETE /tokens/:id.",
+      "expected_behavior": [
+        "NO debe activar la skill. Es implementación pura, no review.",
+        "Si se activa accidentalmente, la description sobre-dispara."
+      ]
+    }
+  ]
+}

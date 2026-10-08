@@ -1,0 +1,7 @@
+{
+  "name": "lens-review",
+  "version": "0.2.0",
+  "description": "Multi-agent code review by lenses: correctness, security, test integrity and blast-radius/architecture, each in an isolated subagent, with adversarial validation of every finding. Advisory only: never approves or merges.",
+  "author": { "name": "Antonio Romero" },
+  "keywords": ["code-review", "multi-agent", "lenses", "pull-request"]
+}
