@@ -1,13 +1,16 @@
 {
   "name": "lens-review",
-  "owner": { "name": "Antonio Romero" },
-  "metadata": { "description": "Multi-agent code review by lenses for Claude Code" },
+  "owner": {
+    "name": "Antonio Romero"
+  },
+  "metadata": {
+    "description": "Multi-agent code review by lenses for Claude Code"
+  },
   "plugins": [
     {
       "name": "lens-review",
       "source": "./plugins/lens-review",
-      "description": "Multi-agent code review by lenses: correctness, security, test integrity and blast-radius/architecture. Advisory only.",
-      "version": "0.2.0"
+      "description": "Multi-agent code review by lenses: correctness, security, test integrity and blast-radius/architecture. Advisory only."
     }
   ]
 }
